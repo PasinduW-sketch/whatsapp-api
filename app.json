@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/appsettings.json",
+  "name": "whatsapp-api-free",
+  "version": "1.0.0",
+  "description": "Free WhatsApp API for sending messages and locations - Open Source",
+  "repository": "https://github.com/YOUR_USERNAME/whatsapp-api",
+  "logo": "https://img.shields.io/badge/WhatsApp-Web-25D366.svg",
+  "keywords": [
+    "whatsapp",
+    "api",
+    "messaging",
+    "free",
+    "open-source",
+    "location-sharing"
+  ],
+  "env": {
+    "PORT": {
+      "description": "Port number for the server",
+      "value": "3000",
+      "required": false
+    }
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
