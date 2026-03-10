@@ -1,0 +1,7 @@
+{
+  "name": "whatsapp-api-tester",
+  "version": "1.0.0",
+  "description": "Test the WhatsApp API endpoints",
+  "main": "test-api.js",
+  "type": "module"
+}

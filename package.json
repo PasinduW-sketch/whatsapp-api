@@ -1,0 +1,28 @@
+{
+  "name": "whatsapp-api-free",
+  "version": "1.0.0",
+  "description": "Free WhatsApp API for sending messages and locations",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "api",
+    "messaging",
+    "free"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "whatsapp-web.js": "^1.23.0",
+    "express": "^4.18.2",
+    "qrcode-terminal": "^0.12.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
