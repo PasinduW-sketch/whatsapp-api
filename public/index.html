@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp API - Free Message & Location Sender</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #25D366;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .status {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        }
+
+        .result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result.success {
+            border-left: 4px solid #25D366;
+        }
+
+        .result.error {
+            border-left: 4px solid #dc3545;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 WhatsApp API</h1>
+        <p class="subtitle">Free Message & Location Sender</p>
+
+        <div id="status" class="status disconnected">
+            Checking connection...
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('message')">Message</div>
+            <div class="tab" onclick="switchTab('location')">Location</div>
+            <div class="tab" onclick="switchTab('combined')">Both</div>
+        </div>
+
+        <!-- Send Message Tab -->
+        <div id="message-tab" class="tab-content active">
+            <div class="form-group">
+                <label>Phone Number:</label>
+                <input type="text" id="msg-number" placeholder="+1234567890">
+            </div>
+            <div class="form-group">
+                <label>Message:</label>
+                <textarea id="msg-text" placeholder="Type your message here..."></textarea>
+            </div>
+            <button class="btn btn-success" onclick="sendMessage()">📤 Send Message</button>
+        </div>
+
+        <!-- Send Location Tab -->
+        <div id="location-tab" class="tab-content">
+            <div class="form-group">
+                <label>Phone Number:</label>
+                <input type="text" id="loc-number" placeholder="+1234567890">
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Latitude:</label>
+                    <input type="number" step="any" id="latitude" placeholder="37.7749">
+                </div>
+                <div class="form-group">
+                    <label>Longitude:</label>
+                    <input type="number" step="any" id="longitude" placeholder="-122.4194">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description (optional):</label>
+                <input type="text" id="loc-description" placeholder="San Francisco, CA">
+            </div>
+            <button class="btn btn-success" onclick="sendLocation()">📍 Send Location</button>
+        </div>
+
+        <!-- Combined Tab -->
+        <div id="combined-tab" class="tab-content">
+            <div class="form-group">
+                <label>Phone Number:</label>
+                <input type="text" id="combo-number" placeholder="+1234567890">
+            </div>
+            <div class="form-group">
+                <label>Message:</label>
+                <textarea id="combo-message" placeholder="Type your message here..."></textarea>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Latitude:</label>
+                    <input type="number" step="any" id="combo-lat" placeholder="37.7749">
+                </div>
+                <div class="form-group">
+                    <label>Longitude:</label>
+                    <input type="number" step="any" id="combo-lng" placeholder="-122.4194">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Location Description:</label>
+                <input type="text" id="combo-desc" placeholder="Shared location">
+            </div>
+            <button class="btn btn-success" onclick="sendCombined()">📨 Send Both</button>
+        </div>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin;
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        async function checkStatus() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                const statusDiv = document.getElementById('status');
+                
+                if (data.connected) {
+                    statusDiv.className = 'status connected';
+                    statusDiv.innerHTML = '✅ WhatsApp Connected';
+                } else {
+                    statusDiv.className = 'status disconnected';
+                    statusDiv.innerHTML = '❌ WhatsApp Not Connected - Please scan QR code in terminal';
+                }
+            } catch (error) {
+                document.getElementById('status').className = 'status disconnected';
+                document.getElementById('status').innerHTML = '❌ Cannot connect to server';
+            }
+        }
+
+        function showResult(data, isError = false) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${isError ? 'error' : 'success'}`;
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        async function sendMessage() {
+            const number = document.getElementById('msg-number').value;
+            const message = document.getElementById('msg-text').value;
+
+            if (!number || !message) {
+                showResult({ error: 'Please fill in all fields' }, true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/send-message`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number, message })
+                });
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({ error: error.message }, true);
+            }
+        }
+
+        async function sendLocation() {
+            const number = document.getElementById('loc-number').value;
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            const description = document.getElementById('loc-description').value;
+
+            if (!number || isNaN(latitude) || isNaN(longitude)) {
+                showResult({ error: 'Please fill in number, latitude, and longitude' }, true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/send-location`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number, latitude, longitude, description })
+                });
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({ error: error.message }, true);
+            }
+        }
+
+        async function sendCombined() {
+            const number= document.getElementById('combo-number').value;
+            const message = document.getElementById('combo-message').value;
+            const latitude = parseFloat(document.getElementById('combo-lat').value);
+            const longitude = parseFloat(document.getElementById('combo-lng').value);
+            const description = document.getElementById('combo-desc').value;
+
+            if (!number || !message || isNaN(latitude) || isNaN(longitude)) {
+                showResult({ error: 'Please fill in all fields' }, true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/send-message-with-location`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        number, 
+                        message, 
+                        latitude, 
+                        longitude, 
+                        locationDescription: description 
+                    })
+                });
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({ error: error.message }, true);
+            }
+        }
+
+        // Check status on load
+        checkStatus();
+        setInterval(checkStatus, 30000); // Check every 30 seconds
+    </script>
+</body>
+</html>

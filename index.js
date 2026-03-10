@@ -1,8 +1,9 @@
 const express = require('express');
 const { Client, Location } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
-const bodyParser = require('body-parser');
+const bodyParser= require('body-parser');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,14 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Serve static files from public directory
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// Home page with UI
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // WhatsApp Client
 let client;
